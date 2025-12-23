@@ -1,8 +1,9 @@
-import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, redirect } from '@tanstack/react-router';
 import { RootLayout } from './layouts/RootLayout';
-import AuthForm from './pages/auth/AuthForm'; 
 import HomePage from './pages/home/HomePage';
-import SettingsPage from './pages/setings/SettingsPage';
+import AuthPage from './pages/auth/AuthForm';
+import ProfilePage from './pages/setings/SettingsPage';
+import { useAuthStore } from './store/authStore';
 
 
 const rootRoute = createRootRoute({
@@ -12,26 +13,38 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: HomePage  ,
+  component: HomePage,
 });
-
 
 const authRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth',
-  component: AuthForm,
+  component: AuthPage,
+  beforeLoad: () => {
+    if (useAuthStore.getState().session) {
+      throw redirect({ to: '/profile' });
+    }
+  },
 });
 
-const settingsRoute = createRoute({
+const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/settings',
-  component: SettingsPage,
+  path: '/profile',
+  component: ProfilePage,
+  beforeLoad: () => {
+    if (!useAuthStore.getState().session) {
+      throw redirect({
+        to: '/auth',
+      });
+    }
+  },
 });
 
+const routeTree = rootRoute.addChildren([indexRoute, authRoute, profileRoute]);
 
-const routeTree = rootRoute.addChildren([indexRoute, authRoute, settingsRoute]);
-export const router = createRouter({ routeTree });
-
+export const router = createRouter({
+  routeTree,
+});
 
 declare module '@tanstack/react-router' {
   interface Register {

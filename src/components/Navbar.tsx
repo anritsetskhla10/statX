@@ -1,7 +1,15 @@
 import { Link } from '@tanstack/react-router';
-import { LayoutDashboard, BarChart3, Settings, Bell, Search, User, Menu } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Bell, Search, User, Menu } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
+
+
 
 export const Navbar = () => {
+
+const { user, session } = useAuthStore();
+const isAuthenticated = !!session;
+const profilePath = isAuthenticated ? `/profile/${user?.id}` : '/auth';
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-dark-bg/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
@@ -18,9 +26,6 @@ export const Navbar = () => {
           <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
             <Link to="/" className="hover:text-white transition-colors flex items-center gap-2 [&.active]:text-neon-blue">
               <LayoutDashboard size={18} /> Dashboard
-            </Link>
-            <Link to="/settings" className="hover:text-white transition-colors flex items-center gap-2">
-              <Settings size={18} /> Settings
             </Link>
           </div>
         </div>
@@ -41,7 +46,10 @@ export const Navbar = () => {
             <span className="absolute top-2 right-2 w-2 h-2 bg-neon-blue rounded-full animate-pulse"></span>
           </button>
 
-          <Link to="/auth" className="hover:text-white transition-colors flex items-center gap-2 [&.active]:text-neon-blue">
+          <Link 
+            to={profilePath} 
+            className="hover:text-white transition-colors flex items-center gap-2 [&.active]:text-neon-blue"
+          >
               <User size={18} /> Profile
           </Link>
 

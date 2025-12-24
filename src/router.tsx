@@ -2,12 +2,14 @@ import { createRootRoute, createRoute, createRouter, redirect } from '@tanstack/
 import { RootLayout } from './layouts/RootLayout';
 import HomePage from './pages/home/HomePage';
 import AuthPage from './pages/auth/AuthForm';
-import ProfilePage from './pages/setings/SettingsPage';
+import ProfilePage from './pages/setings/ProfilePage';
 import { useAuthStore } from './store/authStore';
+import NotFoundPage from './pages/NotFoundPage';
 
 
 const rootRoute = createRootRoute({
   component: RootLayout,
+  notFoundComponent : NotFoundPage
 });
 
 const indexRoute = createRoute({
@@ -39,6 +41,7 @@ const profileRoute = createRoute({
     }
   },
 });
+
 
 const routeTree = rootRoute.addChildren([indexRoute, authRoute, profileRoute]);
 

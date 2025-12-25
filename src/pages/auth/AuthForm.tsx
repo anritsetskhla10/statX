@@ -14,7 +14,7 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-dark-bg p-5 font-poppins text-white overflow-hidden relative">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-dark-bg p-5 font-poppins text-text-main overflow-hidden relative">
       
       {/* Toast Notification */}
       {globalError && (
@@ -23,7 +23,7 @@ const AuthForm: React.FC = () => {
         </div>
       )}
 
-      <div className={`relative w-full max-w-200 h-125 border-2 border-primary shadow-[0_0_25px_rgba(var(--primary),0.5)] overflow-hidden transition-all duration-500 ${isToggled ? 'h-auto min-h-150 md:h-125' : ''}`}>
+      <div className={`relative w-full max-w-200 h-125 border-2 border-primary shadow-[0_0_25px_var(--primary)] overflow-hidden transition-all duration-500 ${isToggled ? 'h-auto min-h-150 md:h-125' : ''}`}>
 
         <BackgroundShapes isToggled={isToggled} />
 

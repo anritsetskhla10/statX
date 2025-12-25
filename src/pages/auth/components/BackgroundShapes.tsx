@@ -11,7 +11,7 @@ const BackgroundShapes: React.FC<BackgroundShapesProps> = ({ isToggled }) => {
         ${isToggled ? 'rotate-0 skew-y-0 delay-500' : 'rotate-10 skew-y-40 delay-1600'}`}>
       </div>
 
-      <div className={`hidden md:block absolute left-62.5 top-full h-175 w-212.5 bg-dark-bg border-t-4 border-primary origin-bottom-left transition-transform duration-1500 ease-in-out z-10
+      <div className={`hidden md:block absolute left-62.5 top-full h-175 w-212.5 bg-bg-main border-t-4 border-primary origin-bottom-left transition-transform duration-1500 ease-in-out z-10
         ${isToggled ? '-rotate-11 -skew-y-41 delay-1200' : 'rotate-0 skew-y-0 delay-500'}`}>
       </div>
     </>

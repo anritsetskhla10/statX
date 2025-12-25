@@ -1,11 +1,11 @@
 import { createRootRoute, createRoute, createRouter, redirect } from '@tanstack/react-router';
 import { RootLayout } from './layouts/RootLayout';
-import HomePage from './pages/home/HomePage';
+import DashboardPage from './pages/DashboardPage/DashboardPage'; 
 import AuthPage from './pages/auth/AuthForm';
 import ProfilePage from './pages/setings/ProfilePage';
-import { useAuthStore } from './store/authStore';
 import NotFoundPage from './pages/NotFoundPage';
-
+import LandingPage from './pages/home/LandingPage'; 
+import { useAuthStore } from './store/authStore';
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -15,7 +15,18 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: HomePage,
+  component: LandingPage, 
+});
+
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/dashboard',
+  component: DashboardPage, 
+  beforeLoad: () => {
+    if (!useAuthStore.getState().session) {
+      throw redirect({ to: '/auth' });
+    }
+  },
 });
 
 const authRoute = createRoute({
@@ -24,7 +35,7 @@ const authRoute = createRoute({
   component: AuthPage,
   beforeLoad: () => {
     if (useAuthStore.getState().session) {
-      throw redirect({ to: '/profile' });
+      throw redirect({ to: '/dashboard' });
     }
   },
 });
@@ -42,11 +53,16 @@ const profileRoute = createRoute({
   },
 });
 
-
-const routeTree = rootRoute.addChildren([indexRoute, authRoute, profileRoute]);
+const routeTree = rootRoute.addChildren([
+    indexRoute, 
+    dashboardRoute, 
+    authRoute, 
+    profileRoute
+]);
 
 export const router = createRouter({
   routeTree,
+  scrollRestoration: true,
 });
 
 declare module '@tanstack/react-router' {

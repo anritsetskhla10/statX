@@ -18,7 +18,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-6">Platform</h4>
+            <h4 className="text-text-main font-semibold mb-6">Platform</h4>
             <ul className="space-y-3 text-sm text-gray-400">
               <FooterLink text="Overview" />
               <FooterLink text="Features" />
@@ -28,7 +28,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-6">Resources</h4>
+            <h4 className="text-text-main font-semibold mb-6">Resources</h4>
             <ul className="space-y-3 text-sm text-gray-400">
               <FooterLink text="Documentation" />
               <FooterLink text="API Reference" />

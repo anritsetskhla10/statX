@@ -18,7 +18,7 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ isToggled, type }) => {
 
   return (
     <div className={wrapperClass}>
-      <h2 className={`text-4xl font-bold uppercase leading-snug text-white transition-all duration-700 ${textDelay}`}>
+      <h2 className={`text-4xl font-bold uppercase leading-snug text-text-main transition-all duration-700 ${textDelay}`}>
         {isLogin ? 'Welcome Back!' : 'Welcome!'}
       </h2>
     </div>

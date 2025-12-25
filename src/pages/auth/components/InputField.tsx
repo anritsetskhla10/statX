@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
-import type { LucideIcon } from 'lucide-react';
+import React, { forwardRef, useState } from 'react';
+import { type LucideIcon, Eye, EyeOff } from 'lucide-react'; 
 
 interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -9,12 +9,20 @@ interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, Icon, delayClass, error, ...props }, ref) => {
+  ({ label, Icon, delayClass, error, type, ...props }, ref) => {
+    const [showPassword, setShowPassword] = useState(false);
+    const isPasswordType = type === 'password';
+
+    const togglePasswordVisibility = () => {
+      setShowPassword(!showPassword);
+    };
+
     return (
-      <div className={`relative my-4 ${delayClass || ''}`}>
+      <div className={`relative w-full mt-6 mb-2 ${delayClass || ''}`}>
         <input
           ref={ref}
-          className={`peer w-full border-b-2 bg-transparent py-2 pl-8 pr-2 text-text-main placeholder-transparent focus:outline-none transition-colors
+          type={isPasswordType ? (showPassword ? 'text' : 'password') : type}
+          className={`peer w-full border-b-2 bg-transparent py-2 pl-8 pr-8 text-text-main placeholder-transparent focus:outline-none transition-colors
             ${error ? 'border-red-500' : 'border-text-muted/30 focus:border-primary'}`}
           placeholder=" "
           {...props}
@@ -25,12 +33,30 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           {label}
         </label>
         
-        <Icon className={`absolute right-0 top-2 ${error ? 'text-red-400' : 'text-text-muted'}`} size={18} />
+        {isPasswordType ? (
+          <button
+            type="button" 
+            onClick={togglePasswordVisibility}
+            className={`absolute right-0 top-2 cursor-pointer focus:outline-none transition-colors duration-300 hover:text-primary
+              ${error ? 'text-red-400' : 'text-text-muted'}`}
+          >
+            {showPassword ? (
+              <EyeOff size={20} />
+            ) : (
+              <Eye size={20} />
+            )}
+          </button>
+        ) : (
+          <Icon 
+            className={`absolute right-0 top-2 ${error ? 'text-red-400' : 'text-text-muted'}`} 
+            size={18} 
+          />
+        )}
         
         {error && (
-          <span className="absolute -bottom-5 left-0 text-xs text-red-400 animate-pulse">
+          <div className="mt-1 text-xs text-red-400 animate-pulse text-left font-medium">
             {error}
-          </span>
+          </div>
         )}
       </div>
     );

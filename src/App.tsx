@@ -3,9 +3,17 @@ import { RouterProvider } from '@tanstack/react-router';
 import { router } from './router';
 import { supabase } from './lib/supabase';
 import { useAuthStore } from './store/authStore'; 
+import { useThemeStore } from './store/themeStore'; 
 
 function App() {
-  const { setSession, setLoading } = useAuthStore.getState();
+  const setSession = useAuthStore((state) => state.setSession);
+  const setLoading = useAuthStore((state) => state.setLoading);
+  
+  const initTheme = useThemeStore((state) => state.initTheme);
+
+  useEffect(() => {
+    initTheme();
+  }, [initTheme]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

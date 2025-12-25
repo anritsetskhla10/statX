@@ -10,8 +10,12 @@ interface ToggleTextProps {
 const ToggleText: React.FC<ToggleTextProps> = ({ text, linkText, onToggle, delayClass }) => {
   return (
     <div className={`text-center mt-5 text-sm transition-all duration-700 ${delayClass}`}>
-      <p>{text} <br />
-        <span onClick={onToggle} className="text-neon-blue font-semibold cursor-pointer hover:underline">
+      <p className="text-gray-400">
+        {text} <br />
+        <span 
+            onClick={onToggle} 
+            className="text-primary font-semibold cursor-pointer hover:underline transition-colors"
+        >
           {linkText}
         </span>
       </p>

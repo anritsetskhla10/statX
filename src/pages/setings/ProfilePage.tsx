@@ -1,49 +1,46 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import ProfileSidebar from './profile/ProfileSidebar';
+import { useAuthStore } from '../../store/authStore'; 
+import { useToastStore } from '../../store/useToastStore';
+
+import ProfileSidebar from './profile/ProfileSidebar'; 
 import ProfileSettings from './profile/ProfileSettings';
 import SecuritySettings from './profile/SecuritySettings';
 import NotificationSettings from './profile/NotificationSettings';
+import AppearanceSettings from './profile/AppearanceSettings';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const { message } = useToastStore(); 
+
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(true);
   
-  const [userId, setUserId] = useState<string | null>(null);
-  const [profileData, setProfileData] = useState({ fullName: '', email: '', bio: '' });
-
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-
-  const showMessage = (type: 'success' | 'error', text: string) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage(null), 3000); 
-  };
+  const [profileData, setProfileData] = useState({ fullName: '', email: '', bio: '', avatarUrl: null });
 
   useEffect(() => {
+    if (!user) {
+        return; 
+    }
+
     async function getProfile() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-          navigate({ to: '/auth' });
-          return;
-        }
-
-        setUserId(user.id);
-        
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
-          .single();
+          .eq('id', user!.id)
+          .maybeSingle();
+
+        if (error) throw error;
 
         setProfileData({
-          fullName: data?.full_name || '',
-          email: user.email || '',
-          bio: data?.bio || ''
+          fullName: data?.full_name || user!.user_metadata?.full_name || '',
+          email: user!.email || '',
+          bio: data?.bio || '',
+          avatarUrl: data?.avatar_url || null,
         });
 
       } catch (error) {
@@ -54,7 +51,7 @@ const ProfilePage = () => {
     }
 
     getProfile();
-  }, [navigate]);
+  }, [user, navigate]);
 
   if (loading) {
     return <div className="flex h-screen items-center justify-center bg-dark-bg text-white"><Loader2 className="animate-spin" /></div>;
@@ -63,11 +60,10 @@ const ProfilePage = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'profile':
-        return userId ? (
+        return user ? (
           <ProfileSettings 
-            userId={userId} 
+            userId={user.id} 
             initialData={profileData} 
-            onShowMessage={showMessage} 
           />
         ) : null;
       
@@ -75,7 +71,10 @@ const ProfilePage = () => {
         return <NotificationSettings />;
       
       case 'security':
-        return <SecuritySettings onShowMessage={showMessage} />;
+        return <SecuritySettings />;
+
+      case 'appearance':
+        return <AppearanceSettings />;
       
       default:
         return <div className="text-gray-400">Section coming soon...</div>;
@@ -96,12 +95,10 @@ const ProfilePage = () => {
       <h1 className="text-3xl font-bold text-white mb-8">Settings</h1>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar */}
         <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        {/* Content Area */}
         <div className="flex-1">
-          <div className="bg-[#1e1e2f] border border-white/5 rounded-3xl p-8 min-h-125">
+          <div className="bg-card-bg border border-white/5 rounded-3xl p-8 min-h-125">
             {renderContent()}
           </div>
         </div>

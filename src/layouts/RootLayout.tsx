@@ -4,7 +4,7 @@ import { Footer } from '../components/Footer';
 
 export const RootLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-dark-bg text-white font-poppins">
+    <div className="flex flex-col min-h-screen bg-dark-bg text-white font-poppins transition-colors duration-300">
       
       <Navbar />
       

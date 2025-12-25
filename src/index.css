@@ -1,22 +1,73 @@
 @import "tailwindcss";
 
-/* Autofill  */
+@theme {
+  --font-poppins: 'Poppins', sans-serif;
+  
+  --color-primary: var(--primary);
+  --color-bg-main: var(--bg-main);
+  --color-card-bg: var(--bg-card);
+  --color-input-bg: var(--bg-input);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-color: var(--border-color);
+}
+
+/* --- ROOT VARIABLES & DENSITY SETTINGS --- */
+:root {
+  --primary: #00d4ff; 
+  
+  --bg-main: #f0f4f8;       
+  --bg-card: #ffffff;       
+  --bg-input: #e2e8f0;      
+  
+  --text-main: #0f172a;     
+  --text-muted: #64748b;    
+  --border-color: #cbd5e1;
+
+  /* Density Default (Comfortable) */
+  --space-layout: 1.5rem; 
+  --space-card: 1.5rem;   
+  --text-base: 1rem;      
+}
+
+/* --- COMPACT MODE OVERRIDES --- */
+[data-density="compact"] {
+  --space-layout: 1rem;   
+  --space-card: 1rem;     
+  --text-base: 0.925rem;  
+}
+
+/* --- DARK MODE --- */
+.dark {
+  --bg-main: #0f0f1a;       
+  --bg-card: #1e1e2f;       
+  --bg-input: #161625;      
+  
+  --text-main: #ffffff;     
+  --text-muted: #9ca3af;    
+  --border-color: rgba(255, 255, 255, 0.1); 
+}
+
+/* --- AUTOFILL FIX --- */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
-input:-webkit-autofill:active{
-    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
-    -webkit-text-fill-color: white !important;
-    caret-color: white !important;
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-input) inset !important;
+    -webkit-text-fill-color: var(--text-main) !important;
+    caret-color: var(--text-main) !important;
+    border-color: var(--primary) !important;
     transition: background-color 5000s ease-in-out 0s;
 }
 
-@theme {
+/* --- GLOBAL STYLES --- */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: var(--text-base);
+}
 
-  --font-poppins: 'Poppins', sans-serif;
-
-  --color-dark-bg: #1a1a2e;
-  --color-neon-blue: #00d4ff;
-
-
+:root:not(.dark) .bg-card-bg {
+  box-shadow: 0 4px 6px -1px rgba(148, 163, 184, 0.1), 0 2px 4px -1px rgba(148, 163, 184, 0.06);
 }

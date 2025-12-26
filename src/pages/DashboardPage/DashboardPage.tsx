@@ -1,35 +1,74 @@
-import { PageHeader } from '../../components/ui/PageHeader';
-import { RevenueCard } from './components/dashboard/RevenueCard';
-import { ActiveUsersCard } from './components/dashboard/ActiveUsersCard';
-import { HealthCard } from './components/dashboard/HealthCard';
-import { TransactionsTable } from './components/dashboard/TransactionsTable';
+import { useState } from 'react';
+import { useAuthStore } from '../../store/authStore';
+import { Loader2 } from 'lucide-react';
+import { useDashboardData } from './hooks/useDashboardData'; 
+import { DashboardHeader } from './components/DashboardHeader';
+import { DashboardTabs } from './components/DashboardTabs';
+import { StatsGrid } from './components/StatsGrid';
+import { PerformanceChart } from './components/PerformanceChart';
+import { RecentActivity } from './components/RecentActivity';
+import { UploadModal } from './components/UploadModal';
+import { AIInsightCard } from './components/AIInsightCard'; 
 
 const DashboardPage = () => {
+  const { user } = useAuthStore();
+  const userName = user?.user_metadata?.full_name || 'User';
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  const { processedData, isLoading, refetch } = useDashboardData();
+
   return (
-    <div className="w-full max-w-7xl mx-auto pb-20 p-(--space-layout) space-y-(--space-layout)">
+    <div className="container mx-auto px-4 py-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
       
-      <PageHeader 
-        title="Dashboard Overview"
-        description="Welcome back! Here is your daily performance."
-        action={
-          <button className="bg-card-bg border border-border-color text-text-main px-4 py-2 rounded-lg text-sm hover:bg-input-bg transition shadow-sm">
-            Last 30 Days
-          </button>
-        }
+      {/* Header */}
+      <DashboardHeader 
+          userName={userName} 
+          setIsUploadModalOpen={setIsUploadModalOpen} 
       />
 
-      {/* Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-(--space-layout)">
-        
-        <RevenueCard />
-        
-        <ActiveUsersCard />
-        
-        <HealthCard />
-        
-        <TransactionsTable />
-        
-      </div>
+      {/* Navigation */}
+      <DashboardTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      {/* Content */}
+      {activeTab === 'overview' && (
+        <div className="space-y-6 animate-in fade-in duration-500">
+           
+           {/* Loading State */}
+           {isLoading && (
+             <div className="flex justify-center py-10">
+                <Loader2 className="animate-spin text-primary" size={40} />
+             </div>
+           )}
+
+           {!isLoading && (
+             <>
+                <AIInsightCard 
+                   stats={processedData?.stats} 
+                   isLoading={isLoading} 
+                />
+
+                {/* Metrics Grid */}
+                <StatsGrid data={processedData?.stats || []} />
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Charts */}
+                    <PerformanceChart data={processedData?.chartData || []} />
+                    <RecentActivity /> 
+                </div>
+             </>
+           )}
+
+        </div>
+      )}
+
+      {/* Upload Modal */}
+      <UploadModal
+        isOpen={isUploadModalOpen} 
+        onClose={() => setIsUploadModalOpen(false)}
+        onUploadSuccess={refetch} 
+      />
+
     </div>
   );
 };

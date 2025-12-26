@@ -1,3 +1,5 @@
+import DashboardImg from '../../../assets/dashboard.png';
+
 const GlassDashboardPreview = () => {
   return (
     <section className="py-24 relative overflow-hidden px-4">
@@ -23,15 +25,10 @@ const GlassDashboardPreview = () => {
             
             {/* Dashboard Image */}
             <img 
-              src="https://placehold.co/1200x800/1e1e2f/00d4ff?text=StatX+Dashboard+Interface" 
+              src={DashboardImg}
               alt="StatX Dashboard Preview" 
               className="rounded-2xl w-full h-auto border border-white/5 shadow-inner"
             />
-
-            {/* Floating Elements (English) */}
-            <FloatingBadge text="Live Data Stream" className="top-10 -left-4 md:-left-10 delay-100" />
-            <FloatingBadge text="AI Insights" className="bottom-20 -right-4 md:-right-10 delay-300" />
-            <FloatingBadge text="Encrypted" className="top-1/2 right-4 md:-right-12 translate-x-0 delay-200" />
           </div>
         </div>
       </div>
@@ -39,12 +36,5 @@ const GlassDashboardPreview = () => {
   );
 };
 
-
-const FloatingBadge = ({ text, className = "" }: { text: string, className?: string }) => (
-  <div className={`absolute hidden md:flex items-center gap-2 px-4 py-2.5 rounded-full bg-card-bg/60 backdrop-blur-md border border-white/10 text-primary text-xs font-bold shadow-xl animate-float ${className}`}>
-    <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--primary)]"></div>
-    {text}
-  </div>
-);
 
 export default GlassDashboardPreview;

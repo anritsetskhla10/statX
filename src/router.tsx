@@ -9,6 +9,9 @@ import FeaturesPage from './pages/FeaturesPage/FeaturesPage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import ContactPage from './pages/ContactPage/ContactPage';
 import { useAuthStore } from './store/authStore';
+import PricingPage from './pages/PricingPage/PricingPage';
+import PrivacyPage from './pages/PrivacyPage/PrivacyPage';
+import TermsPage from './pages/TermsPage/TermsPage';
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -37,6 +40,24 @@ const contactRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/contact',
   component: ContactPage,
+});
+
+const pricingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/pricing',
+  component: PricingPage,
+});
+
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/privacy',
+  component: PrivacyPage,
+});
+
+const termsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/terms',
+  component: TermsPage,
 });
 
 const dashboardRoute = createRoute({
@@ -79,6 +100,9 @@ const routeTree = rootRoute.addChildren([
     featuresRoute,
     aboutRoute,   
     contactRoute, 
+    pricingRoute,
+    privacyRoute,
+    termsRoute,
     dashboardRoute, 
     authRoute, 
     profileRoute

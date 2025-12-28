@@ -1,8 +1,10 @@
 import { Github,  Linkedin, Send, Facebook } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { useCookieStore } from '../store/cookieStore';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const openCookies = useCookieStore((state) => state.openModal);
 
   return (
     <footer className="w-full bg-card-bg border-t border-border-color pt-16 pb-8 mt-auto transition-colors duration-300">
@@ -83,9 +85,12 @@ export const Footer = () => {
             <Link to="/terms" className="hover:text-primary transition-colors">
               Terms of Service
             </Link>
-            <Link to="/cookies" className="hover:text-primary transition-colors">
+            <button 
+              onClick={openCookies} 
+              className="hover:text-primary transition-colors bg-transparent border-none cursor-pointer p-0 font-inherit"
+            >
               Cookie Settings
-            </Link>
+            </button>
           </div>
         </div>
 

@@ -4,7 +4,10 @@ import DashboardPage from './pages/DashboardPage/DashboardPage';
 import AuthPage from './pages/auth/AuthForm';
 import ProfilePage from './pages/setings/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
-import LandingPage from './pages/home/LandingPage'; 
+import LandingPage from './pages/home/LandingPage';
+import FeaturesPage from './pages/FeaturesPage/FeaturesPage'; 
+import AboutPage from './pages/AboutPage/AboutPage';
+import ContactPage from './pages/ContactPage/ContactPage';
 import { useAuthStore } from './store/authStore';
 
 const rootRoute = createRootRoute({
@@ -16,6 +19,24 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: LandingPage, 
+});
+
+const featuresRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/features',
+  component: FeaturesPage,
+});
+
+const aboutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/about',
+  component: AboutPage,
+});
+
+const contactRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/contact',
+  component: ContactPage,
 });
 
 const dashboardRoute = createRoute({
@@ -55,6 +76,9 @@ const profileRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
     indexRoute, 
+    featuresRoute,
+    aboutRoute,   
+    contactRoute, 
     dashboardRoute, 
     authRoute, 
     profileRoute

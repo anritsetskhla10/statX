@@ -1,40 +1,32 @@
 import { Card } from '../../../components/ui/Card';
-import { Badge } from '../../../components/ui/Badge';
-import { transactions } from '../mockData';
+import type { AnalyticsData } from '../hooks/useDashboardData';
+import { ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 
-
-
-export const RecentActivity = () => {
+export const RecentActivity = ({ transactions }: { transactions: AnalyticsData[] }) => {
   return (
-    <Card className="flex flex-col h-full min-h-100">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-bold text-text-main">Live Transactions</h3>
-        <button className="text-xs text-primary font-semibold hover:underline">See All</button>
-      </div>
-      
-      <div className="space-y-0 divide-y divide-border-color/50">
-        {transactions.map((item) => (
-          <div key={item.id} className="flex items-center gap-4 py-4 group hover:bg-input-bg/30 px-3 -mx-3 rounded-lg transition-colors cursor-pointer">
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-input-bg to-card-bg border border-border-color flex items-center justify-center text-lg shadow-sm">
-              {item.type === 'Purchase' ? '🛒' : item.type === 'Refund' ? '💸' : '💎'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-text-main truncate">{item.user}</p>
-              <p className="text-xs text-text-muted">{item.time} • {item.type}</p>
-            </div>
-            <div className="text-right">
-              <p className={`text-sm font-bold ${item.amount > 0 ? 'text-text-main' : 'text-red-400'}`}>
-                {item.amount > 0 ? '+' : ''}${item.amount}
-              </p>
-              <Badge 
-                variant={item.status === 'completed' ? 'success' : item.status === 'pending' ? 'warning' : 'danger'} 
-                className="scale-75 origin-right"
-              >
-                {item.status}
-              </Badge>
-            </div>
+    <Card className="h-full flex flex-col">
+      <h3 className="font-bold text-text-main mb-4">Recent Transactions</h3>
+      <div className="space-y-4 overflow-y-auto flex-1 pr-2 max-h-75">
+        {transactions.map((tx, i) => (
+          <div key={i} className="flex justify-between items-center p-3 hover:bg-input-bg/50 rounded-xl transition-colors">
+             <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-full ${tx.expenses > 0 || tx.refund_amount > 0 ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'}`}>
+                    {tx.expenses > 0 || tx.refund_amount > 0 ? <ArrowDownLeft size={16}/> : <ArrowUpRight size={16}/>}
+                </div>
+                <div>
+                    <p className="font-bold text-sm text-text-main">{tx.customer_name}</p>
+                    <p className="text-xs text-text-muted">{tx.platform} • {new Date(tx.date).toLocaleDateString()}</p>
+                </div>
+             </div>
+             <div className="text-right">
+                <p className={`font-bold text-sm ${tx.expenses > 0 || tx.refund_amount > 0 ? 'text-text-main' : 'text-green-500'}`}>
+                    {tx.expenses > 0 ? `-$${tx.expenses}` : tx.refund_amount > 0 ? `-$${tx.refund_amount}` : `+$${tx.revenue}`}
+                </p>
+                <p className="text-[10px] text-text-muted uppercase">{tx.status}</p>
+             </div>
           </div>
         ))}
+        {transactions.length === 0 && <p className="text-center text-text-muted py-10">No transactions yet</p>}
       </div>
     </Card>
   );

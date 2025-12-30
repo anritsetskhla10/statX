@@ -1,80 +1,70 @@
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Card } from '../../../components/ui/Card';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-export interface ChartItem {
+interface ChartDataPoint {
   name: string;
   revenue: number;
   expenses: number;
-  users: number;
 }
 
-interface PerformanceChartProps {
-  data: ChartItem[];
-}
-
-export const PerformanceChart = ({ data }: PerformanceChartProps) => {
+export const PerformanceChart = ({ data }: { data: ChartDataPoint[] }) => {
   return (
-    <Card className="lg:col-span-2 min-h-100 flex flex-col">
+    <Card className="lg:col-span-2 min-h-100">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-bold text-text-main">Financial Performance</h3>
+        <h3 className="font-bold text-text-main">Financial Overview</h3>
         <div className="flex gap-4 text-xs font-medium">
+            <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-cyan-400"></div> Revenue</span>
+            <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-purple-500"></div> Expenses</span>
         </div>
       </div>
-
-      <div className="flex-1 w-full h-75">
+      
+      <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data}>
             <defs>
-              {/* Revenue Gradient */}
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4}/>
+                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
               </linearGradient>
-              {/* Expenses Gradient */}
               <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#a855f7" stopOpacity={0.4}/>
+                <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
               </linearGradient>
             </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.2} vertical={false} />
+            <XAxis dataKey="name" stroke="#64748b" tickLine={false} axisLine={false} dy={10} fontSize={12} />
+            <YAxis stroke="#64748b" tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} fontSize={12} />
             
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" opacity={0.3} vertical={false} />
-            
-            <XAxis 
-                dataKey="name" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{fill: 'var(--text-muted)', fontSize: 12}} 
-                dy={10}
-            />
-            <YAxis 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{fill: 'var(--text-muted)', fontSize: 12}} 
-                tickFormatter={(value) => `$${value}`}
-            />
             <Tooltip 
-                contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', borderRadius: '12px', color: 'var(--text-main)' }}
-                itemStyle={{ color: 'var(--text-main)' }}
+                contentStyle={{ 
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                  backdropFilter: 'blur(8px)', 
+                  border: '1px solid #334155', 
+                  borderRadius: '12px', 
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.5)' 
+                }}
+                itemStyle={{ color: '#e2e8f0', fontWeight: 500 }}
+              
+                formatter={(value: number | undefined, name: string | undefined) => [
+                  `$${value?.toLocaleString() ?? '0'}`, 
+                  name ?? ''
+                ]}
             />
-            <Legend verticalAlign="top" height={36} iconType="circle"/>
 
-            {/* Revenue Area */}
             <Area 
-                name="Revenue"
                 type="monotone" 
                 dataKey="revenue" 
-                stroke="var(--primary)" 
+                name="Rev" 
+                stroke="#22d3ee" 
                 strokeWidth={3}
                 fillOpacity={1} 
                 fill="url(#colorRevenue)" 
             />
-
-            {/* Expenses Area */}
             <Area 
-                name="Expenses"
                 type="monotone" 
-                dataKey="expenses" 
-                stroke="#f97316" 
+                dataKey="expenses"
+                name="Exp" 
+                stroke="#a855f7" 
                 strokeWidth={3}
                 fillOpacity={1} 
                 fill="url(#colorExpenses)" 

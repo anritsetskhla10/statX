@@ -7,7 +7,7 @@ import { DashboardTabs } from './components/DashboardTabs';
 import { StatsGrid } from './components/StatsGrid';
 import { PerformanceChart } from './components/PerformanceChart';
 import { RecentActivity } from './components/RecentActivity';
-import { UploadModal } from './components/UploadModal';
+import { UploadModal } from './components/UploadModal'; 
 import { AIInsightCard } from './components/AIInsightCard'; 
 
 const DashboardPage = () => {
@@ -43,6 +43,7 @@ const DashboardPage = () => {
 
            {!isLoading && (
              <>
+                {/* AI Insight Section */}
                 <AIInsightCard 
                    stats={processedData?.stats} 
                    isLoading={isLoading} 
@@ -51,10 +52,10 @@ const DashboardPage = () => {
                 {/* Metrics Grid */}
                 <StatsGrid data={processedData?.stats || []} />
 
+                {/* Charts & Activities */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Charts */}
                     <PerformanceChart data={processedData?.chartData || []} />
-                    <RecentActivity /> 
+                    <RecentActivity transactions={processedData?.recentTransactions || []} /> 
                 </div>
              </>
            )}

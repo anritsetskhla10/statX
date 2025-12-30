@@ -1,79 +1,46 @@
-import { TrendingUp, Users, CreditCard, Activity, Wallet, RefreshCcw, DollarSign } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
-import { Badge } from '../../../components/ui/Badge';
+import { TrendingUp, Users, CreditCard, DollarSign } from 'lucide-react';
 
-export interface StatItem {
+
+export interface Stat {
   label: string;
   value: number;
   trend: number;
-  type: string;
+  type: 'currency' | 'number'; 
   progress: number;
   inverse?: boolean;
 }
 
 interface StatsGridProps {
-  data: StatItem[];
+  data: Stat[];
 }
 
 export const StatsGrid = ({ data }: StatsGridProps) => {
+  if (!data) return null;
   
-  const getIcon = (label: string) => {
-    switch(label) {
-      case 'Total Revenue': return CreditCard;
-      case 'Total Expenses': return Wallet;
-      case 'Net Profit': return DollarSign;
-      case 'Refunds': return RefreshCcw;
-      case 'Active Users': return Users;
-      case 'Bounce Rate': return Activity;
-      default: return TrendingUp;
-    }
-  };
-
-  const getColor = (index: number) => {
-    const colors = ['text-primary', 'text-orange-500', 'text-green-500', 'text-red-500', 'text-purple-400'];
-    return colors[index % colors.length];
-  };
-
-  const formatValue = (val: number, type: string) => {
-    if (type === 'currency') return `$${val.toLocaleString()}`;
-    if (type === 'percent') return `${val}%`;
-    return val.toLocaleString();
-  };
-
-  if (!data || data.length === 0) {
-    return <div className="text-text-muted">Loading stats...</div>;
-  }
+  const icons = [CreditCard, DollarSign, TrendingUp, Users];
+  const colors = ['text-blue-500', 'text-orange-500', 'text-green-500', 'text-purple-500'];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {data.map((stat, i) => {
-        const Icon = getIcon(stat.label);
-        const isPositive = stat.inverse ? stat.trend < 0 : stat.trend > 0;
+        const Icon = icons[i] || TrendingUp; 
         
         return (
-          <Card key={i} className="flex flex-col gap-4 p-5 hover:border-primary/30 transition-all duration-300 group hover:-translate-y-1">
+          <Card key={i} className="p-6 flex flex-col gap-2">
             <div className="flex justify-between items-start">
-              <div className={`p-2 rounded-lg bg-input-bg/50 ${getColor(i)} group-hover:bg-primary/10 transition-colors`}>
-                <Icon size={20} />
-              </div>
-              <Badge 
-                variant={isPositive ? 'success' : 'danger'} 
-                className="bg-transparent border border-current"
-              >
-                {stat.trend > 0 ? '+' : ''}{stat.trend}%
-              </Badge>
+               <div className={`p-2 bg-input-bg rounded-lg ${colors[i] || 'text-primary'}`}>
+                 <Icon size={20}/>
+               </div>
+               <span className={`text-xs font-bold px-2 py-1 rounded-full ${stat.trend >= 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                 {stat.trend > 0 ? '+' : ''}{stat.trend}%
+               </span>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-text-main">
-                {formatValue(stat.value, stat.type)}
-              </h3>
-              <p className="text-sm text-text-muted font-medium">{stat.label}</p>
-            </div>
-            <div className="w-full h-1 bg-border-color/30 rounded-full overflow-hidden mt-1">
-               <div 
-                 className={`h-full ${getColor(i).replace('text-', 'bg-')} rounded-full transition-all duration-1000`} 
-                 style={{ width: `${stat.progress}%` }}
-               ></div>
+               <h3 className="text-2xl font-bold text-text-main">
+                  {stat.type === 'currency' ? `$${stat.value.toLocaleString()}` : stat.value}
+               </h3>
+               <p className="text-sm text-text-muted">{stat.label}</p>
             </div>
           </Card>
         );

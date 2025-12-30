@@ -3,26 +3,31 @@ import { supabase } from '../../../lib/supabase';
 import { useAuthStore } from '../../../store/authStore';
 
 export interface AnalyticsData {
+  id: number;
   date: string;
+  customer_name: string;
   revenue: number;
   expenses: number;
   net_profit: number;
   refund_amount: number;
   users: number;
+  new_user: boolean;
   platform: string;
   campaign_name: string;
+  category: string;
+  status: string;
+  region: string;
 }
 
 export const useDashboardData = () => {
   const { user } = useAuthStore();
   const [rawData, setRawData] = useState<AnalyticsData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
+    
     setIsLoading(true);
-    setError(null);
 
     try {
       const { data, error } = await supabase
@@ -32,14 +37,16 @@ export const useDashboardData = () => {
         .order('date', { ascending: true });
 
       if (error) throw error;
-      setRawData(data as AnalyticsData[]);
-    } catch (err: unknown) {
-      console.error('Error fetching data:', err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      
+      if (data) {
+        setRawData(data as AnalyticsData[]);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user]); 
 
   useEffect(() => {
     fetchData();
@@ -48,67 +55,53 @@ export const useDashboardData = () => {
   const processedData = useMemo(() => {
     if (rawData.length === 0) return null;
 
-    const totalRevenue = rawData.reduce((acc, curr) => acc + (Number(curr.revenue) || 0), 0);
-    const totalExpenses = rawData.reduce((acc, curr) => acc + (Number(curr.expenses) || 0), 0);
-    const totalNetProfit = rawData.reduce((acc, curr) => acc + (Number(curr.net_profit) || 0), 0);
-    const totalRefunds = rawData.reduce((acc, curr) => acc + (Number(curr.refund_amount) || 0), 0);
-    const totalUsers = rawData.reduce((acc, curr) => acc + (Number(curr.users) || 0), 0); 
-
+    const totalRevenue = rawData.reduce((acc, curr) => acc + (curr.revenue || 0), 0);
+    const totalExpenses = rawData.reduce((acc, curr) => acc + (curr.expenses || 0), 0);
+    const totalNetProfit = rawData.reduce((acc, curr) => acc + (curr.net_profit || 0), 0);
+    const totalUsers = rawData.reduce((acc, curr) => acc + (curr.users || 0), 0);
+    const totalRefunds = rawData.reduce((acc, curr) => acc + (curr.refund_amount || 0), 0);
     const profitMargin = totalRevenue > 0 ? ((totalNetProfit / totalRevenue) * 100).toFixed(1) : 0;
 
+
     const stats = [
-      { 
-        label: "Total Revenue", 
-        value: totalRevenue, 
-        trend: 12.5, 
-        type: 'currency', 
-        progress: 85 
-      },
-      { 
-        label: "Total Expenses", 
-        value: totalExpenses, 
-        trend: -5, 
-        type: 'currency', 
-        progress: totalRevenue > 0 ? (totalExpenses / totalRevenue) * 100 : 0 
-      },
-      { 
-        label: "Net Profit", 
-        value: totalNetProfit, 
-        trend: Number(profitMargin), 
-        type: 'currency', 
-        progress: Number(profitMargin) 
-      },
-      { 
-        label: "Refunds", 
-        value: totalRefunds, 
-        trend: -2, 
-        type: 'currency', 
-        inverse: true, 
-        progress: totalRevenue > 0 ? (totalRefunds / totalRevenue) * 100 : 0 
-      },{
-        label: "Active Users", 
-        value: totalUsers, 
-        trend: 8.4, 
-        type: 'number', 
-        progress: 70
-      }
+      { label: "Total Revenue", value: totalRevenue, trend: 0, type: 'currency' as const, progress: 85 },
+      { label: "Total Expenses", value: totalExpenses, trend: 0, type: 'currency' as const, progress: totalRevenue > 0 ? (totalExpenses / totalRevenue) * 100 : 0 },
+      { label: "Net Profit", value: totalNetProfit, trend: Number(profitMargin), type: 'currency' as const, progress: Number(profitMargin) },
+      { label: "Active Users", value: totalUsers, trend: 0, type: 'number' as const, progress: 70 },
+      { label: "Total Refunds", value: totalRefunds, trend: 0, type: 'currency' as const, progress: totalRevenue > 0 ? (totalRefunds / totalRevenue) * 100 : 0 }
     ];
 
-    const chartData = rawData.map(item => ({
-      name: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      revenue: item.revenue,
-      expenses: item.expenses,
-      users: item.users
-    }));
+    const chartMap = new Map<string, { name: string; revenue: number; expenses: number; profit: number; rawDate: number }>();
 
-    return { stats, chartData, hasData: true };
+    rawData.forEach((item) => {
+      const dateObj = new Date(item.date);
+      const dateKey = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+      if (chartMap.has(dateKey)) {
+        const existing = chartMap.get(dateKey)!;
+        existing.revenue += item.revenue || 0;
+        existing.expenses += item.expenses || 0;
+        existing.profit += item.net_profit || 0;
+      } else {
+        chartMap.set(dateKey, {
+          name: dateKey,
+          revenue: item.revenue || 0,
+          expenses: item.expenses || 0,
+          profit: item.net_profit || 0,
+          rawDate: dateObj.getTime()
+        });
+      }
+    });
+
+    const chartData = Array.from(chartMap.values())
+      .sort((a, b) => a.rawDate - b.rawDate)
+      .map(({ name, revenue, expenses, profit }) => ({ name, revenue, expenses, profit }));
+
+
+    const recentTransactions = [...rawData].reverse().slice(0, 5);
+
+    return { stats, chartData, recentTransactions, hasData: true };
   }, [rawData]);
 
-  return {
-    rawData,
-    processedData,
-    isLoading,
-    error,
-    refetch: fetchData
-  };
+  return { processedData, isLoading, refetch: fetchData };
 };

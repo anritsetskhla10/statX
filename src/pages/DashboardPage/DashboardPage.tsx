@@ -9,6 +9,7 @@ import { PerformanceChart } from './components/PerformanceChart';
 import { RecentActivity } from './components/RecentActivity';
 import { UploadModal } from './components/UploadModal'; 
 import { AIInsightCard } from './components/AIInsightCard'; 
+import { AnalyticsTab } from './components/AnalyticsTab';
 
 const DashboardPage = () => {
   const { user } = useAuthStore();
@@ -29,38 +30,39 @@ const DashboardPage = () => {
 
       {/* Navigation */}
       <DashboardTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      
+      {isLoading && (
+         <div className="flex justify-center py-20">
+            <Loader2 className="animate-spin text-primary" size={40} />
+         </div>
+      )}
 
-      {/* Content */}
-      {activeTab === 'overview' && (
-        <div className="space-y-6 animate-in fade-in duration-500">
-           
-           {/* Loading State */}
-           {isLoading && (
-             <div className="flex justify-center py-10">
-                <Loader2 className="animate-spin text-primary" size={40} />
+      {!isLoading && (
+        <>
+          {activeTab === 'overview' && (
+            <div className="space-y-6 animate-in fade-in duration-500">
+               <AIInsightCard 
+                  stats={processedData?.stats} 
+                  isLoading={isLoading} 
+               />
+               <StatsGrid data={processedData?.stats || []} />
+               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                   <PerformanceChart data={processedData?.chartData || []} />
+                   <RecentActivity transactions={processedData?.recentTransactions || []} /> 
+               </div>
+            </div>
+          )}
+
+          {activeTab === 'analytics' && processedData && (
+             <AnalyticsTab data={processedData} />
+          )}
+          
+          {activeTab === 'analytics' && !processedData && (
+             <div className="text-center py-20 text-text-muted">
+                No analytics data available. Please upload data first.
              </div>
-           )}
-
-           {!isLoading && (
-             <>
-                {/* AI Insight Section */}
-                <AIInsightCard 
-                   stats={processedData?.stats} 
-                   isLoading={isLoading} 
-                />
-
-                {/* Metrics Grid */}
-                <StatsGrid data={processedData?.stats || []} />
-
-                {/* Charts & Activities */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <PerformanceChart data={processedData?.chartData || []} />
-                    <RecentActivity transactions={processedData?.recentTransactions || []} /> 
-                </div>
-             </>
-           )}
-
-        </div>
+          )}
+        </>
       )}
 
       {/* Upload Modal */}

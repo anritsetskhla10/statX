@@ -60,8 +60,8 @@ export const useDashboardData = () => {
     const totalNetProfit = rawData.reduce((acc, curr) => acc + (curr.net_profit || 0), 0);
     const totalUsers = rawData.reduce((acc, curr) => acc + (curr.users || 0), 0);
     const totalRefunds = rawData.reduce((acc, curr) => acc + (curr.refund_amount || 0), 0);
+    
     const profitMargin = totalRevenue > 0 ? ((totalNetProfit / totalRevenue) * 100).toFixed(1) : 0;
-
 
     const stats = [
       { label: "Total Revenue", value: totalRevenue, trend: 0, type: 'currency' as const, progress: 85 },
@@ -70,7 +70,6 @@ export const useDashboardData = () => {
       { label: "Active Users", value: totalUsers, trend: 0, type: 'number' as const, progress: 70 },
       { label: "Total Refunds", value: totalRefunds, trend: 0, type: 'currency' as const, progress: totalRevenue > 0 ? (totalRefunds / totalRevenue) * 100 : 0 }
     ];
-
     const chartMap = new Map<string, { name: string; revenue: number; expenses: number; profit: number; rawDate: number }>();
 
     rawData.forEach((item) => {
@@ -98,9 +97,72 @@ export const useDashboardData = () => {
       .map(({ name, revenue, expenses, profit }) => ({ name, revenue, expenses, profit }));
 
 
+    const platformMap = new Map<string, number>();
+    rawData.forEach(item => {
+       const name = item.platform || "Other";
+       const currentVal = platformMap.get(name) || 0;
+       platformMap.set(name, currentVal + (item.revenue || 0));
+    });
+    
+    const platformData = Array.from(platformMap, ([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+
+
+    const categoryMap = new Map<string, number>();
+    rawData.forEach(item => {
+       const name = item.category || "Uncategorized";
+       const currentVal = categoryMap.get(name) || 0;
+       categoryMap.set(name, currentVal + (item.revenue || 0));
+    });
+
+    const categoryData = Array.from(categoryMap, ([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 5);
+
+
+    const campaignMap = new Map<string, { revenue: number, count: number }>();
+    rawData.forEach(item => {
+       const name = item.campaign_name || "Organic";
+       const existing = campaignMap.get(name) || { revenue: 0, count: 0 };
+       campaignMap.set(name, { 
+           revenue: existing.revenue + (item.revenue || 0),
+           count: existing.count + 1
+       });
+    });
+
+    const campaignData = Array.from(campaignMap, ([name, { revenue, count }]) => ({ 
+        name, 
+        revenue, 
+        count,
+        performance: Math.min(100, Math.round((revenue / 5000) * 100)) 
+    })).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+
+
+    const statusMap = new Map<string, number>();
+    rawData.forEach(item => {
+        const status = item.status || "Unknown";
+        statusMap.set(status, (statusMap.get(status) || 0) + 1);
+    });
+
+    const funnelData = Array.from(statusMap, ([name, value]) => ({ 
+        name, 
+        value,
+        fill: name === 'Completed' ? '#10b981' : name === 'Pending' ? '#f59e0b' : '#ef4444'
+    })).sort((a, b) => b.value - a.value);
+
     const recentTransactions = [...rawData].reverse().slice(0, 5);
 
-    return { stats, chartData, recentTransactions, hasData: true };
+    return { 
+        stats, 
+        chartData, 
+        recentTransactions, 
+        platformData,
+        categoryData,
+        campaignData, 
+        funnelData,   
+        rawData,
+        hasData: true 
+    };
   }, [rawData]);
 
   return { processedData, isLoading, refetch: fetchData };

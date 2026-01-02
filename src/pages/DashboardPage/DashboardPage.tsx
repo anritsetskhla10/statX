@@ -11,6 +11,7 @@ import { UploadModal } from './components/UploadModal';
 import { AIInsightCard } from './components/AIInsightCard'; 
 import { AnalyticsTab } from './components/AnalyticsTab';
 import { MarketingTab } from './components/MarketingTab';
+import { AIInsightsTab } from './components/AIInsightsTab';
 
 const DashboardPage = () => {
   const { user } = useAuthStore();
@@ -71,6 +72,11 @@ const DashboardPage = () => {
                 No marketing data available. Please upload data first.
              </div>
           )}
+         {activeTab === 'AI Insights' && processedData && (
+               <div className="space-y-6 animate-in fade-in duration-500">
+                  <AIInsightsTab data={processedData} />
+               </div>
+         )}
         </>
       )}
 

@@ -4,7 +4,7 @@ interface TabsProps {
 }
 
 export const DashboardTabs = ({ activeTab, setActiveTab }: TabsProps) => {
-  const tabs = ['overview', 'analytics', 'marketing', 'settings'];
+  const tabs = ['overview', 'analytics', 'marketing', 'AI Insights'];
 
   return (
     <div className="top-70 z-30 w-full overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar">

@@ -13,26 +13,33 @@ interface CustomSelectProps<T> {
   onChange: (value: T) => void;
   options: Option<T>[];
   disabled?: boolean;
+  placeholder?: string; 
+  className?: string;   
 }
 
 export const CustomSelect = <T extends string | number>({ 
   value, 
   onChange, 
   options, 
-  disabled 
+  disabled,
+  placeholder = "Select an option",
+  className = "w-full" 
 }: CustomSelectProps<T>) => {
   
   const selectedOption = options.find((opt) => opt.value === value);
 
   return (
-    <div className="w-full md:w-48 relative">
+    <div className={`${className} relative`}>
       <Listbox value={value} onChange={onChange} disabled={disabled}>
         <div className="relative mt-1">
           
-          <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-input-bg py-2.5 pl-3 pr-10 text-left border border-border-color focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white/75 sm:text-sm text-text-main hover:border-primary/50 transition-colors">
-            <span className="block truncate">{selectedOption?.label || String(value)}</span>
-            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-              <ChevronDown className="h-4 w-4 text-text-muted" aria-hidden="true" />
+          <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-input-bg py-3 pl-4 pr-10 text-left border border-border-color focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white/75 sm:text-sm hover:border-primary/50 transition-colors">
+            <span className={`block truncate ${selectedOption ? 'text-text-main' : 'text-text-muted'}`}>
+              {selectedOption?.label || placeholder}
+            </span>
+            
+            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <ChevronDown className="h-5 w-5 text-text-muted" aria-hidden="true" />
             </span>
           </Listbox.Button>
           
@@ -47,7 +54,7 @@ export const CustomSelect = <T extends string | number>({
                 <Listbox.Option
                   key={optionIdx}
                   className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                    `relative cursor-default select-none py-2.5 pl-10 pr-4 ${
                       active ? 'bg-primary/10 text-primary' : 'text-text-main'
                     } ${option.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`
                   }

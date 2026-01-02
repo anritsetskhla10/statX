@@ -10,6 +10,7 @@ import { RecentActivity } from './components/RecentActivity';
 import { UploadModal } from './components/UploadModal'; 
 import { AIInsightCard } from './components/AIInsightCard'; 
 import { AnalyticsTab } from './components/AnalyticsTab';
+import { MarketingTab } from './components/MarketingTab';
 
 const DashboardPage = () => {
   const { user } = useAuthStore();
@@ -60,6 +61,14 @@ const DashboardPage = () => {
           {activeTab === 'analytics' && !processedData && (
              <div className="text-center py-20 text-text-muted">
                 No analytics data available. Please upload data first.
+             </div>
+          )}
+          {activeTab === 'marketing' && processedData && (
+              <MarketingTab data={processedData} />
+          )}
+          {activeTab === 'marketing' && !processedData && (
+             <div className="text-center py-20 text-text-muted">
+                No marketing data available. Please upload data first.
              </div>
           )}
         </>

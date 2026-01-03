@@ -1,18 +1,17 @@
 import { useMemo } from 'react';
 import type { AnalyticsData } from '../hooks/useDashboardData';
-import { generateForecast, detectAnomalies, getBudgetRecommendations, getRadarData } from '../../../utils/aiHelpers';
+import { generateForecast, detectAnomalies, getRadarData } from '../../../utils/aiHelpers';
 import { Card } from '../../../components/ui/Card';
 import { RevenueForecast } from './AIInsights/RevenueForecast';
 import { AnomalyDetector } from './AIInsights/AnomalyDetector';
-import { BudgetOptimizer } from './AIInsights/BudgetOptimizer';
 import { WhatIfSimulator } from './AIInsights/WhatIfSimulator';
 import { OpportunityRadar } from './AIInsights/OpportunityRadar';
+import { TargetAchiever } from './AIInsights/TargetAchiever';
 
 export const AIInsightsTab = ({ data }: { data: { rawData: AnalyticsData[] } | null }) => {
     const rawData = useMemo(() => data?.rawData || [], [data]);
     const forecastData = useMemo(() => generateForecast(rawData), [rawData]);
     const anomalies = useMemo(() => detectAnomalies(rawData), [rawData]);
-    const budgetRec = useMemo(() => getBudgetRecommendations(rawData), [rawData]);
     const radarData = useMemo(() => getRadarData(rawData), [rawData]);
     
 
@@ -22,7 +21,7 @@ export const AIInsightsTab = ({ data }: { data: { rawData: AnalyticsData[] } | n
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Top Row: Budget & Simulator */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <BudgetOptimizer recommendation={budgetRec} />
+                <TargetAchiever rawData={rawData} />
                 <WhatIfSimulator rawData={rawData} />
             </div>
 

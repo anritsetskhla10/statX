@@ -16,8 +16,9 @@ export interface TargetPlan {
 
 export type StrategyType = 'efficiency' | 'balanced' | 'diversified';
 
-//  Forecasting 
+// Forecasting (Linear Regression with Visual Connection)
 export const generateForecast = (data: AnalyticsData[], daysToForecast = 7) => {
+
   const recentData = data.slice(-30);
   
   const n = recentData.length;
@@ -32,12 +33,20 @@ export const generateForecast = (data: AnalyticsData[], daysToForecast = 7) => {
     sumY += y;
     sumXY += x * y;
     sumXX += x * x;
-    return { name: new Date(item.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}), actual: y, forecast: null };
+    return { 
+        name: new Date(item.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}), 
+        actual: y, 
+        forecast: null as number | null 
+    };
   });
 
   const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
   const intercept = (sumY - slope * sumX) / n;
 
+  const lastRealPoint = points[points.length - 1];
+  if (lastRealPoint) {
+      lastRealPoint.forecast = lastRealPoint.actual;
+  }
   const lastDate = new Date(recentData[recentData.length - 1].date);
   
   const forecastPoints = [];
@@ -84,7 +93,7 @@ export const detectAnomalies = (data: AnalyticsData[]) => {
   }).filter(Boolean) as { date: string, value: number, type: 'spike' | 'drop', diff: number }[];
 };
 
-//  Radar Data Preparation
+// --- Radar Data Preparation ---
 export const getRadarData = (data: AnalyticsData[]) => {
   const totalRev = data.reduce((acc, curr) => acc + curr.revenue, 0);
   const totalExp = data.reduce((acc, curr) => acc + curr.expenses, 0);
@@ -99,13 +108,13 @@ export const getRadarData = (data: AnalyticsData[]) => {
   return [
     { subject: 'Profitability', A: Math.min(100, profitMargin * 2), fullMark: 100 }, 
     { subject: 'Growth', A: Math.min(100, Math.max(0, growth + 50)), fullMark: 100 },
-    { subject: 'Retention', A: 75, fullMark: 100 }, // დემო მონაცემი
+    { subject: 'Retention', A: 75, fullMark: 100 },
     { subject: 'Efficiency', A: Math.min(100, (totalRev / (totalExp || 1)) * 10), fullMark: 100 }, 
     { subject: 'Stability', A: 65, fullMark: 100 },
   ];
 };
 
-// Platform ROAS List (For WhatIfSimulator)
+// --- Platform ROAS List (For WhatIfSimulator) ---
 export const getPlatformROASList = (data: AnalyticsData[]) => {
   const map = new Map<string, { revenue: number; expenses: number }>();
 
@@ -127,7 +136,7 @@ export const getPlatformROASList = (data: AnalyticsData[]) => {
     .sort((a, b) => b.revenue - a.revenue);
 };
 
-// Platform Aggregates (Helper for TargetAchiever)
+// ---Platform Aggregates (Helper for TargetAchiever) ---
 export const getPlatformAggregates = (data: AnalyticsData[]): PlatformData[] => {
   const map = new Map<string, { spend: number; revenue: number }>();
 
@@ -150,7 +159,7 @@ export const getPlatformAggregates = (data: AnalyticsData[]): PlatformData[] => 
     .sort((a, b) => b.currentSpend - a.currentSpend);
 };
 
-// Target Strategy Calculation (Core Logic for TargetAchiever)
+// --- Target Strategy Calculation (Core Logic for TargetAchiever) ---
 export const calculateTargetStrategy = (
     data: AnalyticsData[], 
     targetRevenue: number,
@@ -170,6 +179,7 @@ export const calculateTargetStrategy = (
 
   if (viablePlatforms.length === 0) return [];
 
+  //  Efficiency Strategy
   if (strategy === 'efficiency') {
      const bestPlatform = viablePlatforms[0];
      const requiredSpend = revenueGap / bestPlatform.roas;
@@ -182,6 +192,7 @@ export const calculateTargetStrategy = (
      }];
   }
 
+  // Balanced Strategy (Weighted by ROAS^2)
   if (strategy === 'balanced') {
       const totalWeight = viablePlatforms.reduce((acc, p) => acc + (p.roas * p.roas), 0);
       
@@ -199,6 +210,7 @@ export const calculateTargetStrategy = (
       });
   }
 
+  // Diversified Strategy (Equal Distribution)
   if (strategy === 'diversified') {
       const count = viablePlatforms.length;
       const targetRevenuePart = revenueGap / count;

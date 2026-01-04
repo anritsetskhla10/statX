@@ -1,28 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Search, User, LogOut, Menu, X, Bell } from 'lucide-react'; 
 import { useAuthStore } from '../store/authStore';
-import { NotificationDropdown } from './NotificationDropdown'; 
-
-const mockNotifications = [
-  { id: 1, title: 'New Login Detected', desc: 'New login from Chrome on Windows.', time: '2m ago', read: false, type: 'warning' },
-  { id: 2, title: 'Report Ready', desc: 'Your monthly analytics report is ready.', time: '1h ago', read: false, type: 'success' },
-  { id: 3, title: 'Subscription', desc: 'Your plan will expire in 3 days.', time: '1d ago', read: true, type: 'info' },
-  { id: 4, title: 'Welcome', desc: 'Welcome to StatX!', time: '2d ago', read: true, type: 'info' },
-];
+import { useNotificationStore } from '../store/notificationStore';
+import { NotificationDropdown } from './NotificationDropdown';
+import { timeAgo } from '../utils/formatTime'; 
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { user, session, signOut } = useAuthStore();
-
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   const isAuthenticated = !!session;
   const profilePath = isAuthenticated ? '/profile' : '/auth';
   const userInitial = user?.user_metadata?.full_name?.[0] || user?.email?.[0] || 'U';
-  const unreadCount = mockNotifications.filter(n => !n.read).length;
+
+  const { 
+    notifications, 
+    unreadCount, 
+    fetchNotifications, 
+    subscribeToRealtime, 
+    unsubscribeFromRealtime 
+  } = useNotificationStore();
+
+  useEffect(() => {
+    if (session) {
+      fetchNotifications();
+      subscribeToRealtime();
+    }
+    return () => {
+      unsubscribeFromRealtime();
+    };
+  }, [session, fetchNotifications, subscribeToRealtime, unsubscribeFromRealtime]);
+
+  const formattedNotifications = notifications.map(n => ({
+    id: n.id,
+    title: n.title,
+    desc: n.description,
+    time: timeAgo(n.created_at),
+    read: n.is_read,
+    type: n.type
+  }));
 
   const handleLogout = async () => {
     await signOut();
@@ -49,10 +69,15 @@ export const Navbar = () => {
 
           <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-text-muted">
             {navLinks.map((link) => (
-              <Link key={link.to} to={link.to} className="hover:text-text-main transition-colors flex items-center gap-2 [&.active]:text-primary">
+              <Link 
+                key={link.to} 
+                to={link.to} 
+                className="hover:text-text-main transition-colors flex items-center gap-2 [&.active]:text-primary"
+              >
                 {link.label}
               </Link>
             ))}
+
             {isAuthenticated && (
               <Link to="/dashboard" className="hover:text-text-main transition-colors flex items-center gap-2 [&.active]:text-primary">
                 Dashboard
@@ -75,8 +100,9 @@ export const Navbar = () => {
                 />
               </div>
 
+              {/* Notification Component */}
               <NotificationDropdown 
-                notifications={mockNotifications}
+                notifications={formattedNotifications}
                 isOpen={isNotifOpen}
                 onToggle={() => setIsNotifOpen(!isNotifOpen)}
                 onClose={() => setIsNotifOpen(false)}
@@ -112,6 +138,7 @@ export const Navbar = () => {
       {isMenuOpen && (
         <div className="lg:hidden absolute top-16 left-0 w-full bg-card-bg/95 backdrop-blur-xl border-b border-border-color animate-in slide-in-from-top-2 fade-in duration-200 shadow-2xl z-40 max-h-[calc(100vh-4rem)] overflow-y-auto">
           <div className="flex flex-col p-4 gap-2 text-text-muted font-medium">
+            
             {navLinks.map((link) => (
               <Link key={link.to} to={link.to} onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 hover:text-primary hover:bg-white/5 rounded-lg transition-colors [&.active]:text-primary [&.active]:bg-primary/5">
                   {link.label}
@@ -124,16 +151,18 @@ export const Navbar = () => {
                     Dashboard
                 </Link>
                 {/* Mobile Notification Link */}
-                <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 hover:text-primary hover:bg-white/5 rounded-lg transition-colors">
+                <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 hover:text-primary hover:bg-white/5 rounded-lg transition-colors">
                     <Bell size={20} /> Notifications ({unreadCount})
                 </Link>
               </>
             )}
-            
+
             <div className="h-px bg-border-color my-2 opacity-50"></div>
+
             <Link to={profilePath} onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 hover:text-primary hover:bg-white/5 rounded-lg transition-colors">
               <User size={20} /> {isAuthenticated ? 'Profile Settings' : 'Sign In'}
             </Link>
+
             {isAuthenticated && (
               <button onClick={handleLogout} className="flex items-center gap-3 p-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors w-full text-left">
                 <LogOut size={20} /> Sign Out

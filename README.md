@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# 📊 StatX - AI-Powered Analytics Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-State_Management-blue?style=for-the-badge)
 
-Currently, two official plugins are available:
+**StatX** is a modern, premium SaaS frontend application designed to transform raw Excel/CSV data into actionable, AI-driven business insights. Built with a strict focus on high-performance client-side processing, highly scalable feature-driven architecture, and pristine UX/UI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🔗 **[Live Demo](https://your-live-link.com)** | 📖 **[Read the Case Study](#)**
 
-## React Compiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+[Image of an analytical dashboard with charts and data]
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+*(Note: Add a high-quality screenshot of your dashboard here, e.g., `![StatX Dashboard Preview](/public/og-image.jpg)`)*
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## ✨ Key Features
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* **🧠 Client-Side AI & Forecasting:** Custom-built linear regression and anomaly detection algorithms (`aiHelpers.ts`) run directly in the browser. Predicts revenue trends and detects data spikes without relying on heavy backend machine learning libraries.
+* **📈 Blazing Fast Data Processing:** Excel/CSV files are parsed entirely on the client-side using `xlsx`. This eliminates server processing bottlenecks and provides zero-latency feedback to the user.
+* **🎨 Highly Customizable UI (Glassmorphism):** * Full Dark/Light/System theme support.
+  * User-selectable **Accent Colors** and **Interface Density** (Comfortable vs Compact) managed globally via CSS Variables and Zustand.
+* **🔒 Secure & Seamless Authentication:** Handled via Supabase with an interactive, animated UI. Includes a **"Guest Login"** feature for frictionless portfolio demonstration.
+* **⚡ Modern Routing:** Utilizes `@tanstack/react-router` for type-safe routing and robust protected route logic (`beforeLoad` guards).
+* **📱 Interactive Visualizations:** Dynamic radar, area, and bar charts built with `recharts`, heavily customized with gradients and backdrop-blur tooltips.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🛠️ Tech Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* **Core:** React 18, TypeScript, Vite
+* **Routing:** TanStack Router (`@tanstack/react-router`)
+* **State Management:** Zustand (Modular stores with `persist` middleware)
+* **Styling:** Tailwind CSS + Custom CSS Variables
+* **Data Visualization:** Recharts
+* **Forms & Validation:** React Hook Form + Zod
+* **Backend / Auth:** Supabase (PostgreSQL, Realtime Subscriptions)
+* **File Parsing:** SheetJS (`xlsx`)
+
+---
+
+## 📂 Architecture & Folder Structure
+
+This project follows a **Feature-Driven (Co-location)** architecture to ensure extreme scalability and maintainability. Components, hooks, and logic specific to a feature are grouped together.
+
+```text
+src/
+├── components/          # Global Reusable UI (Navbar, Footer, Modals)
+│   └── ui/              # Dumb components (Card, Badge, InputField, Select)
+├── lib/                 # Third-party configurations
+│   ├── supabase.ts      # Supabase client setup
+│   └── validation.ts    # Zod schemas (Auth, Profile)
+├── pages/               # Route components, separated by domains
+│   ├── DashboardPage/   # Dashboard feature (Tabs, Charts, local hooks)
+│   │   ├── components/  # Dashboard-specific UI (PerformanceChart, StatsGrid)
+│   │   └── hooks/       # Localized state (useDashboardData)
+│   ├── auth/            # Authentication flow (Login, Register, Guest mode)
+│   ├── home/            # Landing page and marketing sections
+│   └── setings/         # Profile, Security, and Appearance management
+├── store/               # Global Zustand stores (Separation of Concerns)
+│   ├── authStore.ts
+│   ├── themeStore.ts
+│   └── notificationStore.ts
+├── utils/               # Pure functions & Business Logic
+│   ├── aiHelpers.ts         # Math logic for regression & anomalies
+│   ├── marketingHelpers.ts  # ROAS, ROI calculations
+│   └── analyticsHelpers.ts  # Data aggregation & time-series formatting
+├── router.tsx           # Centralized type-safe route tree & Auth Guards
+└── main.tsx             # Application entry point

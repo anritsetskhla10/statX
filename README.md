@@ -9,13 +9,11 @@
 
 **StatX** is a modern, premium SaaS frontend application designed to transform raw Excel/CSV data into actionable, AI-driven business insights. Built with a strict focus on high-performance client-side processing, highly scalable feature-driven architecture, and pristine UX/UI.
 
-🔗 **[Live Demo](https://your-live-link.com)** | 📖 **[Read the Case Study](#)**
+🔗 **[Live Demo]([https://your-live-link.com](https://stat-x.vercel.app/))** | 📖 **[Read the Case Study](#)**
+
+<img width="1551" height="786" alt="image" src="https://github.com/user-attachments/assets/118e1dec-0de6-46ad-b46a-e452d3cb746f" />
 
 
-
-[Image of an analytical dashboard with charts and data]
-
-*(Note: Add a high-quality screenshot of your dashboard here, e.g., `![StatX Dashboard Preview](/public/og-image.jpg)`)*
 
 ---
 

@@ -1,0 +1,20 @@
+{
+  "id": "stat-x",
+  "title": "StatX",
+  "description": {
+    "en": "A premium SaaS analytics platform that transforms raw Excel and CSV data into AI-driven business intelligence — entirely in the browser. Features a custom linear regression engine for 7-day revenue forecasting, a statistical anomaly detector using a 1.5σ threshold, and a multi-strategy budget optimizer built without any external ML dependencies. Backed by a real-time notification layer via Supabase channels, a fully type-safe routing system with auth guards, and a dynamic theme engine supporting dark, light, and system modes with four accent palettes — all persisted through Zustand middleware.",
+    "ka": "პრემიუმ SaaS ანალიტიკური პლატფორმა, რომელიც Excel და CSV ფაილებს პირდაპირ ბრაუზერში AI-ზე დაფუძნებულ ბიზნეს-ინტელექტად გარდაქმნის. მოიცავს შემოსავლის 7-დღიანი პროგნოზირებისთვის შექმნილ ლინეარული რეგრესიის ძრავას, სტატისტიკურ ანომალიების დეტექტორს 1.5σ ზღვრით და მულტი-სტრატეგიულ ბიუჯეტის ოპტიმიზატორს — ყოველივე ეს გარე ML სერვისების გარეშე. პროექტი ეყრდნობა Supabase-ის რეალურ დროში შეტყობინებების სისტემას, სრულად ტიპიზებულ მარშრუტიზაციას auth guard-ებით და დინამიურ თემის ძრავას, რომელიც dark, light და system რეჟიმებს ოთხი accent ფერით მხარს უჭერს."
+  },
+  "technologies": [
+    "React 19",
+    "TypeScript",
+    "Supabase",
+    "TanStack Router",
+    "Zustand",
+    "Recharts",
+    "Tailwind CSS",
+    "Zod"
+  ],
+  "imageCount": 4,
+  "link": "https://stat-x.vercel.app/"
+}

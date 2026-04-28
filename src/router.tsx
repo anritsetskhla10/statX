@@ -1,11 +1,8 @@
-import { createRootRoute, createRoute, createRouter, redirect } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, redirect, lazyRouteComponent } from '@tanstack/react-router';
 import { RootLayout } from './layouts/RootLayout';
-import DashboardPage from './pages/DashboardPage/DashboardPage'; 
 import AuthPage from './pages/auth/AuthForm';
-import ProfilePage from './pages/setings/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 import LandingPage from './pages/home/LandingPage';
-import FeaturesPage from './pages/FeaturesPage/FeaturesPage'; 
 import AboutPage from './pages/AboutPage/AboutPage';
 import ContactPage from './pages/ContactPage/ContactPage';
 import { useAuthStore } from './store/authStore';
@@ -29,7 +26,7 @@ const indexRoute = createRoute({
 const featuresRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/features',
-  component: FeaturesPage,
+  component: lazyRouteComponent(() => import('./pages/FeaturesPage/FeaturesPage')),
 });
 
 const aboutRoute = createRoute({
@@ -77,7 +74,7 @@ const termsRoute = createRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/dashboard',
-  component: DashboardPage, 
+  component: lazyRouteComponent(() => import('./pages/DashboardPage/DashboardPage')), 
   beforeLoad: () => {
     if (!useAuthStore.getState().session) {
       throw redirect({ to: '/auth' });
@@ -99,7 +96,7 @@ const authRoute = createRoute({
 const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/profile',
-  component: ProfilePage,
+  component: lazyRouteComponent(() => import('./pages/setings/ProfilePage')),
   beforeLoad: () => {
     if (!useAuthStore.getState().session) {
       throw redirect({

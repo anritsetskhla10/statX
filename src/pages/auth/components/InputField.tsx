@@ -37,6 +37,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           <button
             type="button" 
             onClick={togglePasswordVisibility}
+            aria-label={showPassword ? "Hide password" : "Show password"}
             className={`absolute right-0 top-2 cursor-pointer focus:outline-none transition-colors duration-300 hover:text-primary
               ${error ? 'text-red-400' : 'text-text-muted'}`}
           >

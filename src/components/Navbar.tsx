@@ -121,13 +121,21 @@ export const Navbar = () => {
           </Link>
 
           {isAuthenticated && (
-            <button onClick={handleLogout} className="hidden md:flex p-2 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all">
+            <button 
+              onClick={handleLogout} 
+              aria-label="Log out"
+              className="hidden md:flex p-2 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all"
+            >
               <LogOut size={18} />
             </button>
           )}
 
           {/* MOBILE MENU TOGGLE */}
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-2 text-text-muted hover:text-text-main">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)} 
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            className="lg:hidden p-2 text-text-muted hover:text-text-main"
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 

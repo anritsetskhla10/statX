@@ -48,6 +48,7 @@ export const NotificationDropdown = ({
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={onToggle}
+        aria-label="Toggle notifications"
         className={`p-2 rounded-full transition-all relative ${
             isOpen ? 'bg-input-bg text-text-main' : 'text-text-muted hover:text-text-main hover:bg-input-bg'
         }`}

@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { Bell, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
 interface Notification {
-  id: number;
+  id: string; 
   title: string;
   desc: string;
   time: string;

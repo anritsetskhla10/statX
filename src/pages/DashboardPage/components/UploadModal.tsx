@@ -51,6 +51,20 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }: UploadModalPro
       const { error } = await supabase.from('user_analytics').insert(formattedData);
       if (error) throw error;
 
+      const { error: notifError } = await supabase.from('notifications').insert([
+        {
+          user_id: user.id,
+          title: 'Data Import Successful',
+          description: `Successfully processed and imported ${formattedData.length} rows from your Excel file.`,
+          type: 'success',
+          is_read: false
+        }
+      ]);
+
+      if (notifError) {
+        console.error('Failed to create notification:', notifError);
+      }
+
       setStatus('success');
       setMessage(`Successfully imported ${formattedData.length} rows!`);
       

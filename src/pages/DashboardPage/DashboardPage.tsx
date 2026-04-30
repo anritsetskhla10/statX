@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
-import { Loader2 } from 'lucide-react';
 import { useDashboardData } from './hooks/useDashboardData'; 
 import { DashboardHeader } from './components/DashboardHeader';
 import { DashboardTabs } from './components/DashboardTabs';
@@ -12,6 +11,7 @@ import { AIInsightCard } from './components/AIInsightCard';
 import { AnalyticsTab } from './components/AnalyticsTab';
 import { MarketingTab } from './components/MarketingTab';
 import { AIInsightsTab } from './components/AIInsightsTab';
+import { DashboardSkeleton } from './components/DashboardSkeleton';
 
 const DashboardPage = () => {
   const { user } = useAuthStore();
@@ -34,8 +34,8 @@ const DashboardPage = () => {
       <DashboardTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       
       {isLoading && (
-         <div className="flex justify-center py-20">
-            <Loader2 className="animate-spin text-primary" size={40} />
+         <div className="mt-8">
+            <DashboardSkeleton />
          </div>
       )}
 
@@ -44,8 +44,8 @@ const DashboardPage = () => {
           {activeTab === 'overview' && (
             <div className="space-y-6 animate-in fade-in duration-500">
                <AIInsightCard 
-                  stats={processedData?.stats} 
-                  isLoading={isLoading} 
+                 stats={processedData?.stats} 
+                 isLoading={isLoading} 
                />
                <StatsGrid data={processedData?.stats || []} />
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

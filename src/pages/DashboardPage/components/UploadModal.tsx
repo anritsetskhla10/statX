@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import { supabase } from '../../../lib/supabase';
 import { useAuthStore } from '../../../store/authStore';
 import { UploadCloud, X, FileSpreadsheet, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }: UploadModalPro
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [progress, setProgress] = useState(0);
 
   if (!isOpen) return null;
 
@@ -22,6 +24,14 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }: UploadModalPro
     if (!user) return;
     setIsLoading(true);
     setStatus('idle');
+    setProgress(0);
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 90) return 90;
+        return prev + Math.floor(Math.random() * 15) + 5;
+      });
+    }, 200);
 
     try {
       const data = await file.arrayBuffer();
@@ -65,16 +75,32 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }: UploadModalPro
         console.error('Failed to create notification:', notifError);
       }
 
+      clearInterval(interval);
+      setProgress(100);
       setStatus('success');
       setMessage(`Successfully imported ${formattedData.length} rows!`);
-      
+
       setTimeout(() => {
         onUploadSuccess();
         onClose();
         setStatus('idle');
-      }, 1500);
+        setProgress(0);
+        toast.success('Data successfully analyzed', {
+          duration: 4000,
+          style: {
+            background: '#10B981',
+            color: '#fff',
+            borderRadius: '10px',
+          },
+          iconTheme: {
+            primary: '#fff',
+            secondary: '#10B981',
+          },
+        });
+      }, 1200);
 
     } catch (error: unknown) {
+      clearInterval(interval);
       setStatus('error');
       setMessage('Error uploading file. Please check format.');
       console.error(error);
@@ -85,24 +111,40 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }: UploadModalPro
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-card-bg border border-border-color w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
+      <div className="bg-card-bg border border-border-color w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-6 border-b border-border-color flex justify-between items-center">
           <h2 className="text-xl font-bold text-text-main flex items-center gap-2">
             <FileSpreadsheet className="text-primary" /> Import Excel
           </h2>
-          <button onClick={onClose}><X size={20} className="text-text-muted" /></button>
+          <button onClick={onClose} disabled={isLoading} className="disabled:opacity-50 transition-opacity">
+            <X size={20} className="text-text-muted hover:text-text-main" />
+          </button>
         </div>
 
         <div className="p-10 text-center">
             {isLoading ? (
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-4 w-full max-w-xs mx-auto">
                     <Loader2 className="animate-spin text-primary" size={40} />
-                    <p className="text-text-main">Processing...</p>
+                    <div className="w-full">
+                        <div className="flex justify-between text-sm font-medium text-text-main mb-2">
+                            <span>Processing Data...</span>
+                            <span>{progress}%</span>
+                        </div>
+                        <div className="w-full bg-input-bg rounded-full h-2.5 overflow-hidden">
+                            <div 
+                              className="bg-primary h-2.5 rounded-full transition-all duration-300 ease-out" 
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                        </div>
+                    </div>
                 </div>
             ) : status === 'success' ? (
-                <div className="flex flex-col items-center gap-2">
-                    <CheckCircle className="text-green-500" size={40} />
-                    <p className="text-green-500 font-bold">{message}</p>
+                <div className="flex flex-col items-center gap-3 animate-in slide-in-from-bottom-4 duration-300">
+                    <div className="h-16 w-16 bg-green-500/20 rounded-full flex items-center justify-center mb-2">
+                      <CheckCircle className="text-green-500" size={40} />
+                    </div>
+                    <p className="text-green-500 font-bold text-lg">Analysis Complete!</p>
+                    <p className="text-sm text-text-muted">{message}</p>
                 </div>
             ) : (
                 <>
@@ -113,14 +155,23 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }: UploadModalPro
                         className="hidden" 
                         id="file-upload"
                     />
-                    <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center gap-4 p-8 border-2 border-dashed border-border-color rounded-2xl hover:border-primary hover:bg-primary/5 transition-all">
-                        <UploadCloud size={48} className="text-primary" />
+                    <label 
+                      htmlFor="file-upload" 
+                      className="cursor-pointer flex flex-col items-center gap-4 p-8 border-2 border-dashed border-border-color rounded-2xl hover:border-primary hover:bg-primary/5 transition-all group"
+                    >
+                        <div className="p-4 bg-input-bg rounded-full group-hover:scale-110 transition-transform">
+                          <UploadCloud size={40} className="text-primary" />
+                        </div>
                         <div>
-                            <p className="font-bold text-text-main">Click to Upload Excel</p>
-                            <p className="text-sm text-text-muted">.xlsx or .csv files</p>
+                            <p className="font-bold text-text-main text-lg">Click to Upload Excel</p>
+                            <p className="text-sm text-text-muted mt-1">Supports .xlsx or .csv files</p>
                         </div>
                     </label>
-                    {status === 'error' && <p className="text-red-500 mt-4 font-medium flex items-center justify-center gap-2"><AlertCircle size={16}/> {message}</p>}
+                    {status === 'error' && (
+                      <p className="text-red-500 mt-6 font-medium flex items-center justify-center gap-2 bg-red-500/10 py-2 px-4 rounded-lg">
+                        <AlertCircle size={18}/> {message}
+                      </p>
+                    )}
                 </>
             )}
         </div>

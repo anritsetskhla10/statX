@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Camera, Mail, Save, Loader2 } from 'lucide-react';
+import { Camera, Mail, Save, Loader2, CheckCircle } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { profileSchema, type ProfileFormValues } from '../../../lib/validation';
 import { useToastStore } from '../../../store/useToastStore';
@@ -18,11 +18,12 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ userId, initialData }
   const [avatarUrl, setAvatarUrl] = useState<string | null>(initialData.avatarUrl || null);
   const [uploading, setUploading] = useState(false);
 
+  const [buttonStatus, setButtonStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+
   const { 
     register, 
     handleSubmit, 
-    setValue, 
-    formState: { isSubmitting } 
+    setValue 
   } = useForm<ProfileFormValues>({ 
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -61,7 +62,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ userId, initialData }
       if (updateError) throw updateError;
 
       setAvatarUrl(`${publicUrl}?t=${new Date().getTime()}`);
-      showToast('success', 'ავატარი განახლდა!');
+      showToast('success', 'ავატარი წარმატებით განახლდა!');
     } catch (error: unknown) {
       showToast('error', (error as Error).message || 'Error uploading avatar');
     } finally {
@@ -70,13 +71,25 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ userId, initialData }
   };
 
   const onUpdateProfile = async (data: ProfileFormValues) => {
+    setButtonStatus('loading');
+    
     try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
       const { error } = await supabase.from('profiles').upsert({
           id: userId, full_name: data.fullName, bio: data.bio, updated_at: new Date(),
         }).eq('id', userId);
       if (error) throw error;
-      showToast('success', 'პროფილი განახლდა!');
+      
+      setButtonStatus('success');
+      showToast('success', 'პროფილი წარმატებით განახლდა!');
+      
+      setTimeout(() => {
+        setButtonStatus('idle');
+      }, 2000);
+      
     } catch (error: unknown) {
+      setButtonStatus('idle');
       showToast('error', (error as Error).message || 'Error updating profile');
     }
   };
@@ -150,11 +163,19 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ userId, initialData }
 
       <div className="pt-4 flex justify-end">
         <button 
-          type="submit" disabled={isSubmitting}
-          className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg font-semibold hover:opacity-90 transition-all disabled:opacity-50 shadow-lg shadow-primary/25"
+          type="submit" 
+          disabled={buttonStatus !== 'idle'}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold transition-all shadow-lg disabled:opacity-50 ${
+            buttonStatus === 'success'
+              ? 'bg-green-500 text-white shadow-green-500/25'
+              : 'bg-primary text-white hover:opacity-90 shadow-primary/25'
+          }`}
         >
-          {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} 
-          Save Changes
+          {buttonStatus === 'loading' && <Loader2 className="animate-spin" size={18} />} 
+          {buttonStatus === 'success' && <CheckCircle size={18} />} 
+          {buttonStatus === 'idle' && <Save size={18} />} 
+          
+          {buttonStatus === 'idle' ? 'Save Changes' : buttonStatus === 'loading' ? 'Saving...' : 'Saved!'}
         </button>
       </div>
     </form>

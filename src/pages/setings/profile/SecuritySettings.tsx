@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock, Loader2, Trash2, AlertTriangle } from 'lucide-react';
+import { Lock, Loader2, Trash2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { supabase } from '../../../lib/supabase';
 import { passwordSchema, type PasswordFormValues } from '../../../lib/validation';
@@ -10,15 +10,31 @@ import { useToastStore } from '../../../store/useToastStore';
 const SecuritySettings: React.FC = () => { 
   const navigate = useNavigate();
   const { showToast } = useToastStore();
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
+  const { register, handleSubmit, reset } = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
+
+  const [buttonStatus, setButtonStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
   const onUpdatePassword = async (data: PasswordFormValues) => {
+    setButtonStatus('loading');
+
     try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
       const { error } = await supabase.auth.updateUser({ password: data.password });
       if (error) throw error;
+      
+      setButtonStatus('success');
       showToast('success', 'პაროლი წარმატებით განახლდა!');
       reset();
-    } catch (error: unknown) { showToast('error', (error as Error).message); }
+
+      setTimeout(() => {
+        setButtonStatus('idle');
+      }, 2000);
+
+    } catch (error: unknown) { 
+      setButtonStatus('idle');
+      showToast('error', (error as Error).message); 
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -29,7 +45,9 @@ const SecuritySettings: React.FC = () => {
       await supabase.auth.signOut();
       alert('ანგარიში წაიშალა.');
       navigate({ to: '/auth' });
-    } catch (error: unknown) { showToast('error', (error as Error).message); }
+    } catch (error: unknown) { 
+      showToast('error', (error as Error).message); 
+    }
   };
 
   return (
@@ -51,8 +69,18 @@ const SecuritySettings: React.FC = () => {
             />
           </div>
           <div className="flex justify-end mt-2">
-            <button type="submit" disabled={isSubmitting} className="text-sm bg-primary/10 text-primary px-4 py-2 rounded-lg hover:bg-primary/20 transition-colors font-medium flex items-center gap-2">
-               {isSubmitting && <Loader2 className="animate-spin" size={14} />} Update Password
+            <button 
+              type="submit" 
+              disabled={buttonStatus !== 'idle'} 
+              className={`text-sm px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2 ${
+                buttonStatus === 'success' 
+                  ? 'bg-green-500/20 text-green-500 border border-green-500/30' 
+                  : 'bg-primary/10 text-primary hover:bg-primary/20 border border-transparent'
+              }`}
+            >
+               {buttonStatus === 'loading' && <Loader2 className="animate-spin" size={16} />}
+               {buttonStatus === 'success' && <CheckCircle size={16} />}
+               {buttonStatus === 'idle' ? 'Update Password' : buttonStatus === 'loading' ? 'Updating...' : 'Saved!'}
             </button>
           </div>
         </div>

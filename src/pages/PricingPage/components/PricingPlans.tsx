@@ -17,7 +17,7 @@ export const PricingPlans = () => {
     },
     {
       name: "Pro",
-      price: isYearly ? 29 : 39,
+      price: isYearly ? 24 : 29, 
       period: "per month",
       desc: "For growing businesses.",
       features: ["5 Users", "Unlimited Uploads", "AI Insights & Forecasts", "Advanced Analytics", "Priority Support"],
@@ -42,17 +42,27 @@ export const PricingPlans = () => {
       <div className="container mx-auto px-4">
         
         {/* Toggle Switch */}
-        <div className="flex items-center justify-center gap-4 mb-16">
-          <span className={`text-sm font-medium ${!isYearly ? 'text-text-main' : 'text-text-muted'}`}>Monthly</span>
-          <button 
-            onClick={() => setIsYearly(!isYearly)}
-            className="w-14 h-8 bg-input-bg border border-border-color rounded-full relative transition-colors duration-300 focus:outline-none"
-          >
-            <div className={`absolute top-1 left-1 w-6 h-6 bg-primary rounded-full transition-transform duration-300 shadow-md ${isYearly ? 'translate-x-6' : 'translate-x-0'}`}></div>
-          </button>
-          <span className={`text-sm font-medium ${isYearly ? 'text-text-main' : 'text-text-muted'}`}>
-            Yearly <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full ml-1">-20%</span>
-          </span>
+        <div className="flex flex-col items-center justify-center gap-4 mb-16">
+          <div className="flex items-center gap-4">
+            <span className={`text-sm font-bold transition-colors ${!isYearly ? 'text-text-main' : 'text-text-muted'}`}>
+              Monthly
+            </span>
+            
+            <button 
+              onClick={() => setIsYearly(!isYearly)}
+              className="w-16 h-8 bg-input-bg border border-border-color rounded-full relative transition-colors duration-300 focus:outline-none hover:border-primary/50"
+              aria-label="Toggle pricing period"
+            >
+              <div className={`absolute top-1 left-1 w-6 h-6 bg-primary rounded-full transition-transform duration-300 shadow-md ${isYearly ? 'translate-x-8' : 'translate-x-0'}`}></div>
+            </button>
+            
+            <span className={`text-sm font-bold flex items-center gap-2 transition-colors ${isYearly ? 'text-text-main' : 'text-text-muted'}`}>
+              Annually
+              <span className="text-xs font-bold text-white bg-green-500 px-2.5 py-1 rounded-full shadow-sm animate-in fade-in zoom-in duration-300">
+                Save 20%
+              </span>
+            </span>
+          </div>
         </div>
 
         {/* Cards Grid */}
@@ -66,7 +76,7 @@ export const PricingPlans = () => {
                   : 'bg-card-bg/50 border-border-color hover:border-primary/50'}`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg tracking-wide">
                   MOST POPULAR
                 </div>
               )}
@@ -77,19 +87,29 @@ export const PricingPlans = () => {
               </div>
 
               <div className="mb-8">
-                <div className="flex items-end gap-1">
-                  <span className="text-4xl font-bold text-text-main">${plan.price}</span>
-                  <span className="text-text-muted mb-1">/{plan.period}</span>
+                <div className="flex items-end gap-1 h-12 overflow-hidden">
+                  <span className="text-4xl font-bold text-text-main flex items-center">
+                    $
+                    <div key={plan.price} className="animate-in slide-in-from-bottom-4 fade-in duration-300">
+                      {plan.price}
+                    </div>
+                  </span>
+                  <span className="text-text-muted mb-1 pb-1">/{plan.period}</span>
                 </div>
-                {isYearly && plan.price > 0 && (
-                   <p className="text-xs text-primary mt-2">Billed ${plan.price * 12} yearly</p>
-                )}
+                
+                <div className="h-6 mt-1">
+                    {isYearly && plan.price > 0 && (
+                    <p className="text-xs font-medium text-primary animate-in fade-in slide-in-from-top-2 duration-300">
+                        Billed ${plan.price * 12} yearly
+                    </p>
+                    )}
+                </div>
               </div>
 
-              <button className={`w-full py-3 rounded-xl font-bold mb-8 transition-colors
+              <button className={`w-full py-3 rounded-xl font-bold mb-8 transition-all active:scale-95
                 ${plan.popular 
                   ? 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/25' 
-                  : 'bg-input-bg text-text-main hover:bg-input-bg/80'}`}
+                  : 'bg-input-bg text-text-main hover:bg-input-bg/80 border border-border-color'}`}
               >
                 {plan.cta}
               </button>
